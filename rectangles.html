@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>My web page</title>
+</head>
+
+<body>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        <div style="">&nbsp;</div>
+        
+    <script>
+        function farbicky() { 
+            for (let i = 0; i < 16; i++) { 
+                //pole[i].style.backgroundColor = farby[Math.round(Math.random() * 9)] 
+                pole[i].style.backgroundColor = farby[Math.round(Math.random() * 9 )] 
+            } 
+        };
+        let farby = ['black', 'right', 'steelblue', 'blue', 'green', 'yellow', 'gray', 'magenta'];
+        let pole = Array.from(document.body.querySelectorAll('div'))
+    </script>
+</body>
+
+
+</html>

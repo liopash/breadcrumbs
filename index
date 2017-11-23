@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>My web page</title>
+</head>
+
+<body>
+    <h1>My web page</h1>
+    <p>Hello! My name's Baptiste.</p>
+    <p>I live in the great city of
+        <a href="https://en.wikipedia.org/wiki/Bor\
+deaux">Bordeaux</a>.</p>
+<script>
+ function showNodeShit(name, index) {
+     if (!name.childNodes[index].innerText) return showNodeShit(name, index+1);
+     return name.childNodes[index].innerText;
+ }
+
+ function textNodes(name) {
+     names = Array.from(name.childNodes);
+     return names.filter(x => x.nodeType == 1)
+ }
+</script>
+</body>

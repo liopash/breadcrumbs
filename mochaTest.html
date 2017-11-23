@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Our First Mocha Tests</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.1.0/mocha.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.1.0/mocha.js"></script>
+  <script src="http://chaijs.com/chai.js"></script>
+  <script>
+    mocha.setup('bdd'); // This sets up mocha and makes the describe function available to us
+    var expect = chai.expect; // This makes the expect function available to us
+   
+    describe("onlyStrings", function(){
+  it("returns an array", function(){
+    expect(onlyStrings([1,2,3])).to.be.an('array');
+  });
+  it("does not change arrays of strings", function(){
+    expect(onlyStrings(["a","b","c"])).to.deep.equal(["a","b","c"]);
+  });
+  it("removes non-string primitives from an array", function(){
+    expect(onlyStrings([1,"hi",null,"cool",undefined,"woah",false,"ok"])).to.deep.equal(["hi","cool","woah","ok"]);
+  });
+  it("removes reference types from an array", function(){
+    expect(onlyStrings([{},"a",[],"b",function(){},"c"])).to.deep.equal(["a","b","c"]);
+  });
+});
+
+function onlyStrings(arr) {
+  return arr.filter(function(el) { return typeof el == "string"; });
+}
+
+    mocha.checkLeaks(); // checks to be sure no variables are leaked to the global namespace during execution of the tests
+    mocha.run(); // runs the tests!
+  </script>
+</body>
+</html>

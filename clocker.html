@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>My web page</title>
+</head>
+
+<body>
+    <div id='clocker' style='font-size: 200px; padding-left: 150px; padding-top: 50px'></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.29.0/date_fns.min.js"></script>
+    <script>
+
+        let casik = () => { 
+            seKundy = dateFns.format(new Date(),'hh:mm:ss');
+            document.body.querySelector('#clocker').innerText = seKundy; 
+            console.log(seKundy);
+            //if (seKundy > 58) clearInterval(intervalez);
+        }
+
+        let intervalez = setInterval(casik, 1000)
+
+    </script>
+</body>
