@@ -2,30 +2,57 @@
 fun same_string(s1 : string, s2 : string) =
   s1 = s2
 
-fun is_in_list (_,[]) = false
-  | is_in_list (c,a::b) = if same_string(c,a) then true else is_in_list(c,b) 
-
-fun all_except_string (_,[]) = []
-  | all_except_string (c,a::b) = if same_string(c,a)
-                                 then all_except_string(c,b)
-			         else a::all_except_string(c,b)
 (* problem 1.a) *)							  
+
 fun all_except_option x =
   case x of
       (_,[]) => NONE
-   |   (z,a::b) => if (a::b) = (all_except_string x) then NONE else SOME (all_except_string x)
+   |  (x,a::b) => let fun aux (x,[],c) = all_except_option(x,[])
+			| aux (x,a::b,c) =
+			  case x=a of
+			      true => SOME (c@b)
+			   |  false => aux(x,b,a::c)
+		  in
+		      aux(x,a::b,[])
+		  end
 
 (* problem 1.b) *)									 
+
 fun get_substitutions1 ([],_) = []
-  | get_substitutions1 (a::b,c) = if is_in_list(c,a) then all_except_string(c,a) @ get_substitutions1(b,c) else get_substitutions1(b,c) 				   
-(* problem 1.d) 						       
-val test4 = similar_names ([["Fred","Fredrick"],["Elizabeth","Betty"],["Freddie","Fred","F"]], {first="Fred", middle="W", last="Smith"}) =
-	    [{first="Fred", last="Smith", middle="W"}, {first="Fredrick", last="Smith", middle="W"},
-	          {first="Freddie", last="Smith", middle="W"}, {first="F", last="Smith", middle="W"}]  *)
+  | get_substitutions1 (a::b,c) =
+    case all_except_option(c,a) of
+	NONE => get_substitutions1(b,c)
+      | SOME x => x@get_substitutions1(b,c)
+			      
+(*problem 1.c) *)
 
+fun get_substitutions2 ([],_) = []
+  | get_substitutions2 (a::b,c) =
+    let
+        fun aux ([],_,d) = d
+       	| aux (a::b,c,d) =
+	  case all_except_option(c,a) of
+              NONE => aux(b,c,d)
+	    | SOME x => aux(b,c,d@x)
+     in
+        aux(a::b,c,[])
+    end
+			   
+(* problem 1.d) *)
 
+fun similar_names x =
+  case x of
+      ([],name) => [name]
+    | (x::z,{first=a, middle=b, last=c}) =>
+                  let val names = get_substitutions1(x::z,a)
+		      fun replacer ([],name,que) = que
+			| replacer (x'::z',{first=a, middle=b, last=c},que) = replacer(z',{first=a, middle=b, last=c},que@[{first=x', middle=b, last=c}]) 
+		  in
+		      replacer (names,{first=a, middle=b, last=c},[{first=a, middle=b, last=c}])
+		  end
+						
 
-(* you may assume that Num is always used with values 2, 3, ..., 10    though it will not really come up *)
+(* Problem 2 *)	
 
 datatype suit = Clubs | Diamonds | Hearts | Spades
 datatype rank = Jack | Queen | King | Ace | Num of int
@@ -39,15 +66,15 @@ exception IllegalMove
 (* put your solutions for problem 2 here *)
 
 fun card_color (a, _) =
-  if a = Clubs orelse a = Spades
-  then Black
-  else Red
+  case a of
+      Clubs => Black 
+    | Spades => Black
+    | _ => Red
        
 fun card_value (_, Num x) = x
   | card_value (_, Ace) = 11
   | card_value _ = 10
 
-		       (* a function remove_card, which takes a list of cards cs, a card c, and an exception e *)		       
 fun remove_card (cs, c, e) =
   case (cs, c) of
       ([],_) => raise e
@@ -56,9 +83,6 @@ fun remove_card (cs, c, e) =
 fun all_same_color ([]) = true 
   | all_same_color (_::[]) = true  
   | all_same_color (a::b::c) = card_color(a)=card_color(b) andalso all_same_color (b::c)
-
-fun sum_cards2 ([]) = 0 
-  | sum_cards2 (a::b) = card_value a + sum_cards2 b
 
 fun sum_cards cards =
   let
@@ -71,10 +95,27 @@ fun sum_cards cards =
   end
 		      
 fun score ([], goal) = goal 
-  | score (cards, goal) = goal - sum_cards
-			  
-	
-										 
-		       
-		   
-			       
+  | score (cards, goal) =
+    let
+	val sum = sum_cards cards
+	val color = all_same_color cards		    
+    in
+	case sum > goal of
+	    true => if color then 3 * (sum - goal) div 2 else 3 * (sum - goal)
+	  | false => if color then (goal - sum) div 2 else goal - sum
+    end		  
+
+fun officiate (cards : card list, moves: move list, goal: int) =
+  let
+      fun game x =
+	case x of
+	    ([],moves,goal,held) => score(held,goal)
+	  | (_,[],goal,held) => score(held,goal)
+	  | (c::cards',move::moves',goal,held)  => case sum_cards held > goal of
+						       true => score(held,goal)
+						    | false => case move of
+								   Draw => game(cards',moves',goal,c::held)
+								 | Discard x => game(c::cards',moves',goal,remove_card(held,x,IllegalMove))
+  in
+      game(cards,moves,goal,[])
+  end
