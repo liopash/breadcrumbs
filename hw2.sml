@@ -93,9 +93,8 @@ fun sum_cards cards =
   in
       f(cards,0)
   end
-		      
-fun score ([], goal) = goal 
-  | score (cards, goal) =
+      
+fun score (cards, goal) =
     let
 	val sum = sum_cards cards
 	val color = all_same_color cards		    
