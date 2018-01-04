@@ -172,4 +172,6 @@ fun all_answers f xs =
     val count_wild_and_variable_lengths =
          g (fn x => 1) (fn y => size y)
 
-    
+    fun count_some_var (str,p) = 
+         g (fn x => 0) (fn y => if y=str then 1 else 0) p
+         
