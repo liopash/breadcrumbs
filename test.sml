@@ -175,18 +175,18 @@ fun all_answers f xs =
     fun count_some_var (str,p) = 
          g (fn x => 0) (fn y => if y=str then 1 else 0) p
     
-    fun check_pat p =
+    fun get_var p =
         case p of
         Wildcard          => []
 	  | Variable x        => [x]
-	  | TupleP ps         => List.foldl (fn (p,acc) => check_pat p @ acc) [] ps
-	  | ConstructorP(_,p) => check_pat p
+	  | TupleP ps         => List.foldl (fn (p,acc) => get_var p @ acc) [] ps
+	  | ConstructorP(_,p) => get_var p
 	  | _                 => []
 
     fun duplicated [] = false
   | duplicated (x::xs) = (List.exists (fn y => x = y) xs) orelse (duplicated xs)
 
-val check_pat2 = not o duplicated o check_pat
+val check_pat = not o duplicated o get_var
 
 (*
 val match = fn : valu * pattern -> (string * valu) list option
@@ -208,6 +208,18 @@ them with =) and p matches v. The list of bindings produced is the list from the
 We call the strings s1 and s2 the constructor name.
 • Nothing else matches.*)
 
+fun match (p) =
+  case p of
+      (_,Wildcard) => SOME []
+    | (x, Variable y) => SOME [(y, x)]
+    | (Unit, UnitP) => SOME []
+    | (Const a, ConstP b) => if a = b then SOME [] else NONE 			    
+    | (Tuple vs, TupleP ps)  => if length vs = length ps
+				then all_answers match (ListPair.zip (vs,ps))
+				else NONE
+    |  (Constructor(s1,v), ConstructorP(s2,p)) => if s1 = s2 then match (v,p) else NONE  
+    |  _  => NONE				       
 
+					
 
 
