@@ -174,4 +174,40 @@ fun all_answers f xs =
 
     fun count_some_var (str,p) = 
          g (fn x => 0) (fn y => if y=str then 1 else 0) p
-         
+    
+    fun check_pat p =
+        case p of
+        Wildcard          => []
+	  | Variable x        => [x]
+	  | TupleP ps         => List.foldl (fn (p,acc) => check_pat p @ acc) [] ps
+	  | ConstructorP(_,p) => check_pat p
+	  | _                 => []
+
+    fun duplicated [] = false
+  | duplicated (x::xs) = (List.exists (fn y => x = y) xs) orelse (duplicated xs)
+
+val check_pat2 = not o duplicated o check_pat
+
+(*
+val match = fn : valu * pattern -> (string * valu) list option
+val first_match = fn : valu -> pattern list -> (string * valu) list option
+*)
+(*
+• Wildcard matches everything and produces the empty list of bindings.
+• Variable s matches any value v and produces the one-element list holding (s,v).
+• UnitP matches only Unit and produces the empty list of bindings.
+• ConstP 17 matches only Const 17 and produces the empty list of bindings (and similarly for other
+integers).
+• TupleP ps matches a value of the form Tuple vs if ps and vs have the same length and for all i, the
+i
+th element of ps matches the i
+th element of vs. The list of bindings produced is all the lists from the
+nested pattern matches appended together.
+• ConstructorP(s1,p) matches Constructor(s2,v) if s1 and s2 are the same string (you can compare
+them with =) and p matches v. The list of bindings produced is the list from the nested pattern match.
+We call the strings s1 and s2 the constructor name.
+• Nothing else matches.*)
+
+
+
+
